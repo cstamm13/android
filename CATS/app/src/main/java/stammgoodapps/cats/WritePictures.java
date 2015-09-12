@@ -36,51 +36,77 @@ public class WritePictures extends Application {
         return stream.toByteArray();
     }
 
-    public void updatePictures(ArrayList<Uri> rawContactUris)
-            throws RemoteException, OperationApplicationException, IndexOutOfBoundsException {
-        final ContentResolver resolver = context.getContentResolver();
-        final String TAG = "updatePictures";
-        byte[] photo = getPhoto();
+    public int getPhotoRow(Uri rawContactUri, boolean allContacts) {
 
-        for (Uri rawContactUri : rawContactUris) {
-            ContentValues ops = new ContentValues();
-            int photoRow = -1;
-            String where = ContactsContract.Data.RAW_CONTACT_ID + " == " +
+        final ContentResolver resolver = context.getContentResolver();
+        int photoRow = -1;
+        String where;
+//        switch (R.id.which_contacts) {
+//            case (R.id.no_photo):
+        if (allContacts) {
+            where = ContactsContract.Data.RAW_CONTACT_ID + " == " +
                     ContentUris.parseId(rawContactUri) + " AND " +
                     Data.MIMETYPE + "=='" +
                     ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'";
+        } else {
+            where = ContactsContract.Data.RAW_CONTACT_ID + " == " +
+                    ContentUris.parseId(rawContactUri) + " AND " +
+                    Data.MIMETYPE + "=='" +
+                    ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + " AND " +
+                    ContactsContract.CommonDataKinds.Photo.PHOTO + " IS NULL OR " +
+                    ContactsContract.CommonDataKinds.Photo.PHOTO + " = ?'";
+        }
 
-            Cursor cursor = resolver.query(
-                    ContactsContract.Data.CONTENT_URI,
-                    null,
-                    where,
-                    null,
-                    null);
+        Cursor cursor = resolver.query(
+                ContactsContract.Data.CONTENT_URI,
+                null,
+                where,
+                null,
+                null);
 
-            int columnIndex = cursor.getColumnIndex(ContactsContract.Data._ID);
+        int columnIndex = cursor.getColumnIndex(ContactsContract.Data._ID);
+        if (columnIndex == -1) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (cursor.moveToFirst()) {
+            photoRow = cursor.getInt(columnIndex);
+        }
+        cursor.close();
 
-            if (columnIndex == -1) {
-                throw new IndexOutOfBoundsException();
-            }
-            if (cursor.moveToFirst()) {
-                photoRow = cursor.getInt(columnIndex);
-            }
-            cursor.close();
-            ops.put(ContactsContract.Data.RAW_CONTACT_ID,
-                    ContentUris.parseId(rawContactUri));
-            ops.put(ContactsContract.Data.IS_SUPER_PRIMARY, 1);
-            ops.put(ContactsContract.CommonDataKinds.Photo.PHOTO, photo);
-            ops.put(ContactsContract.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
+        return photoRow;
+
+    }
+
+    public ContentValues buildContactContentValues(Uri rawContactUri) {
+        ContentValues ops = new ContentValues();
+        byte[] photo = getPhoto();
+        ops.put(ContactsContract.Data.RAW_CONTACT_ID,
+                ContentUris.parseId(rawContactUri));
+        ops.put(ContactsContract.Data.IS_SUPER_PRIMARY, 1);
+        ops.put(ContactsContract.CommonDataKinds.Photo.PHOTO, photo);
+        ops.put(ContactsContract.Data.MIMETYPE,
+                ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
+        return ops;
+    }
+
+    public void updatePictures(ArrayList<Uri> rawContactUris, boolean allContacts)
+            throws RemoteException, OperationApplicationException, IndexOutOfBoundsException {
+        final ContentResolver resolver = context.getContentResolver();
+        final String TAG = "updatePictures";
+
+        for (Uri rawContactUri : rawContactUris) {
+
+            int photoRow = getPhotoRow(rawContactUri, allContacts);
+            ContentValues contactContentValues = buildContactContentValues(rawContactUri);
             if (photoRow >= 0) {
                 resolver.update(
                         ContactsContract.Data.CONTENT_URI,
-                        ops,
+                        contactContentValues,
                         ContactsContract.Data._ID + " = " + photoRow, null);
             } else {
                 resolver.insert(
                         ContactsContract.Data.CONTENT_URI,
-                        ops);
+                        contactContentValues);
             }
         }
     }

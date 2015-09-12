@@ -24,14 +24,25 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         WritePictures writePictures = new WritePictures(this);
+        ArrayList<Uri> contactIds;
+
         try {
-            Log.d(TAG, "Starting this shit up");
-            ArrayList<Uri> contactIds;
-            Log.d(TAG, "Created array");
-            contactIds = writePictures.readPhoneContacts();
-            Log.d(TAG, "contactIds = " + contactIds);
-            writePictures.updatePictures(contactIds);
-            Log.d(TAG, "Wrote pictures");
+            switch (R.id.which_contacts) {
+                case (R.id.no_photo):
+                    contactIds = writePictures.readPhoneContacts();
+                    Log.d(TAG, "contactIds = " + contactIds);
+                    writePictures.updatePictures(contactIds, false);
+                    Log.d(TAG, "Wrote pictures");
+                    break;
+                case (R.id.all_contacts):
+                    contactIds = writePictures.readPhoneContacts();
+                    Log.d(TAG, "contactIds = " + contactIds);
+                    writePictures.updatePictures(contactIds, false);
+                    Log.d(TAG, "Wrote pictures");
+                    break;
+                case (R.id.select_contacts):
+                    
+            }
         } catch (Exception e) {
             Log.e(TAG, "Threw Exception: " + e.getMessage());
         }
