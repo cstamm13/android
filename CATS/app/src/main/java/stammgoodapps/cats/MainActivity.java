@@ -9,6 +9,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SimpleCursorAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,6 +24,29 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        setContentView(R.layout.contact_list_entry);
+
+        ArrayList<Uri> contactIds;
+
+        WritePictures writePictures = new WritePictures(this);
+        contactIds = writePictures.readPhoneContacts();
+        Log.d(TAG, "contactIds = " + contactIds);
+        try {
+
+        writePictures.updatePictures(contactIds, true);
+        Log.d(TAG, "Wrote pictures");
+    } catch (Exception e) {
+        Log.e(TAG, "Threw Exception: " + e.getMessage());
+    }
+        Log.e(TAG, "getting list");
+        writePictures.launchMultiplePhonePicker();
+
+    }
+
+    protected void onAction() {
+
+
+
         WritePictures writePictures = new WritePictures(this);
         ArrayList<Uri> contactIds;
 
@@ -41,11 +65,16 @@ public class MainActivity extends Activity {
                     Log.d(TAG, "Wrote pictures");
                     break;
                 case (R.id.select_contacts):
-                    
+                    break;
+
             }
         } catch (Exception e) {
             Log.e(TAG, "Threw Exception: " + e.getMessage());
         }
+
+
+
+
     }
 
     @Override
