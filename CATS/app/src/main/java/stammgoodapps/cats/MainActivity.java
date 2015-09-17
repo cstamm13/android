@@ -1,80 +1,77 @@
 package stammgoodapps.cats;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SimpleCursorAdapter;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
+    private RadioGroup radioGroup;
+    private RadioButton radioButton;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        setContentView(R.layout.contact_list_entry);
-
-        ArrayList<Uri> contactIds;
-
-        WritePictures writePictures = new WritePictures(this);
-        contactIds = writePictures.readPhoneContacts();
-        Log.d(TAG, "contactIds = " + contactIds);
-        try {
-
-        writePictures.updatePictures(contactIds, true);
-        Log.d(TAG, "Wrote pictures");
-    } catch (Exception e) {
-        Log.e(TAG, "Threw Exception: " + e.getMessage());
-    }
-        Log.e(TAG, "getting list");
-        writePictures.launchMultiplePhonePicker();
-
+        addListenerOnButton();
     }
 
-    protected void onAction() {
 
+    public void addListenerOnButton() {
+        final WritePictures writePictures = new WritePictures(this);
 
+        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+        button = (Button) findViewById(R.id.choice_button);
+        button.setOnClickListener(new View.OnClickListener() {
 
-        WritePictures writePictures = new WritePictures(this);
-        ArrayList<Uri> contactIds;
+            @Override
+            public void onClick(View v) {
+                int selectedButton = radioGroup.getCheckedRadioButtonId();
+                radioButton = (RadioButton) findViewById(selectedButton);
+                ArrayList<Uri> contactIds;
 
-        try {
-            switch (R.id.which_contacts) {
-                case (R.id.no_photo):
-                    contactIds = writePictures.readPhoneContacts();
-                    Log.d(TAG, "contactIds = " + contactIds);
-                    writePictures.updatePictures(contactIds, false);
-                    Log.d(TAG, "Wrote pictures");
-                    break;
-                case (R.id.all_contacts):
-                    contactIds = writePictures.readPhoneContacts();
-                    Log.d(TAG, "contactIds = " + contactIds);
-                    writePictures.updatePictures(contactIds, false);
-                    Log.d(TAG, "Wrote pictures");
-                    break;
-                case (R.id.select_contacts):
-                    break;
+                try {
+                    switch (radioButton.getId()) {
+                        case (R.id.no_photo):
+                            contactIds = writePictures.readPhoneContacts();
+                            Log.d(TAG, "contactIds = " + contactIds);
+                            writePictures.updatePictures(contactIds, false);
+                            Log.d(TAG, "Wrote pictures");
+                            break;
+                        case (R.id.all_contacts):
+                            contactIds = writePictures.readPhoneContacts();
+                            Log.d(TAG, "contactIds = " + contactIds);
+                            writePictures.updatePictures(contactIds, false);
+                            Log.d(TAG, "Wrote pictures");
+                            break;
+                        case (R.id.select_contacts):
+                            writePictures.launchMultiplePhonePicker();
+                            break;
+
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Threw Exception: " + e.getMessage());
+                }
 
             }
-        } catch (Exception e) {
-            Log.e(TAG, "Threw Exception: " + e.getMessage());
-        }
+        });
+
+    }
 
 
-
-
+    protected void onAction() {
     }
 
     @Override

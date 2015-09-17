@@ -1,8 +1,6 @@
 package stammgoodapps.cats;
 
 import android.app.Application;
-
-import android.app.IntentService;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -12,25 +10,13 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.AnimatedStateListDrawable;
 import android.net.Uri;
-import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.os.RemoteException;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 public class WritePictures extends Application {
@@ -55,14 +41,15 @@ public class WritePictures extends Application {
 
         final ContentResolver resolver = context.getContentResolver();
         int photoRow = -1;
-        String where;
+        final String SELECTION;
+        final Uri PROJECTION = ContactsContract.Data.CONTENT_URI;
         if (allContacts) {
-            where = ContactsContract.Data.RAW_CONTACT_ID + " == " +
+            SELECTION = ContactsContract.Data.RAW_CONTACT_ID + " == " +
                     ContentUris.parseId(rawContactUri) + " AND " +
                     Data.MIMETYPE + "=='" +
                     ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'";
         } else {
-            where = ContactsContract.Data.RAW_CONTACT_ID + " == " +
+            SELECTION = ContactsContract.Data.RAW_CONTACT_ID + " == " +
                     ContentUris.parseId(rawContactUri) + " AND " +
                     Data.MIMETYPE + "=='" +
                     ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + " AND " +
@@ -71,9 +58,9 @@ public class WritePictures extends Application {
         }
 
         Cursor cursor = resolver.query(
-                ContactsContract.Data.CONTENT_URI,
+                PROJECTION,
                 null,
-                where,
+                SELECTION,
                 null,
                 null);
 
@@ -152,7 +139,6 @@ public class WritePictures extends Application {
 
     public void launchMultiplePhonePicker() {
         final String TAG = "PhonePicker";
-        Log.e(TAG, "Starting selection");
         Intent intent = new Intent(context, ListViewLoader.class);
         intent.setAction(Intent.ACTION_PICK);
         intent.putExtra(Intent.EXTRA_PHONE_NUMBER, true);
