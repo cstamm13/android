@@ -45,8 +45,14 @@ public class ListViewAdapter extends ArrayAdapter<ContactPair> {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        viewHolder.contactName.setText(pairs[position].getName());
-        viewHolder.contactPhoto.setImageURI(pairs[position].getPhoto());
+        if (pairs[position].getName() != null) {
+            viewHolder.contactName.setText(pairs[position].getName());
+        }
+        if (pairs[position].getPhoto() != null) {
+            viewHolder.contactPhoto.setImageURI(pairs[position].getPhoto());
+        } else {
+            viewHolder.contactPhoto.setImageURI(null);
+        }
         viewHolder.checkBox.setClickable(true);
 
         return view;

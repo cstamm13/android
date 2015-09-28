@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -16,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListViewLoader extends Activity {
+
+    private Button cancelButton;
+    private Button proceedButton;
 
     static final String[] PROJECTION = new String[]{
             ContactsContract.Data._ID,
@@ -25,6 +30,8 @@ public class ListViewLoader extends Activity {
     static final String SELECTION = "((" +
             ContactsContract.Data.DISPLAY_NAME + " NOTNULL) AND (" +
             ContactsContract.Data.DISPLAY_NAME + " != '' ))";
+
+    static final String SORT_ORDER = ContactsContract.Data.DISPLAY_NAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +54,7 @@ public class ListViewLoader extends Activity {
                         PROJECTION,
                         SELECTION,
                         null,
-                        null);
+                        SORT_ORDER);
 
         try {
             if (contactIdCursor.getCount() > 0) {
@@ -56,11 +63,14 @@ public class ListViewLoader extends Activity {
                     String contactName = contactIdCursor.getString(
                             contactIdCursor.getColumnIndex(
                                     ContactsContract.Contacts.DISPLAY_NAME));
-                    Uri contactPhotoUri = Uri.parse(
-                            contactIdCursor.getString(
-                                    contactIdCursor.getColumnIndex(
-                                            ContactsContract.Contacts.PHOTO_THUMBNAIL_URI)));
-                    contactPair.add(new ContactPair(contactName, contactPhotoUri));
+                    String contactPhotoString = contactIdCursor.getString(
+                            contactIdCursor.getColumnIndex(
+                                    ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
+                    if (contactPhotoString != null) {
+                        contactPair.add(new ContactPair(contactName, Uri.parse(contactPhotoString)));
+                    } else {
+                        contactPair.add(new ContactPair(contactName, null));
+                    }
                 }
 
                 ListViewAdapter adapter = new ListViewAdapter(this, contactPair.toArray(new ContactPair[contactPair.size()]));
@@ -69,11 +79,22 @@ public class ListViewLoader extends Activity {
             }
 
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "Threw exception: " + e.getMessage());
         } finally {
             contactIdCursor.close();
             root.removeView(progressBar);
+            addCancelButton();
         }
+    }
+
+    public void addCancelButton() {
+        cancelButton = (Button) findViewById(R.id.cancel_selection);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
 //    @Override
