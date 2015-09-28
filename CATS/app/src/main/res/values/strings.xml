@@ -7,4 +7,6 @@
     <string name="work_it">Let\'s do this!</string>
     <string name="contact_list">Choose wisely, my furry friend</string>
     <string name="current_contact_photo">The current photo set for the contact</string>
+    <string name="cancel_selection">Cancel</string>
+    <string name="continue_selection">Awesome!</string>
 </resources>
