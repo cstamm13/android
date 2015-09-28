@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.os.RemoteException;
@@ -89,10 +90,11 @@ public class WritePictures extends Application {
         return ops;
     }
 
-    public void updatePictures(ArrayList<Uri> rawContactUris, boolean allContacts)
+    public void updatePictures(boolean allContacts)
             throws RemoteException, OperationApplicationException, IndexOutOfBoundsException {
         final ContentResolver resolver = context.getContentResolver();
         final String TAG = "updatePictures";
+        ArrayList<Uri> rawContactUris = readPhoneContacts();
 
         for (Uri rawContactUri : rawContactUris) {
 
