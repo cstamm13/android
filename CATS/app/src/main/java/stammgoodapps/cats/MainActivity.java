@@ -45,16 +45,10 @@ public class MainActivity extends Activity {
                 try {
                     switch (radioButton.getId()) {
                         case (R.id.no_photo):
-                            contactIds = writePictures.readPhoneContacts();
-                            Log.d(TAG, "contactIds = " + contactIds);
-                            writePictures.updatePictures(contactIds, false);
-                            Log.d(TAG, "Wrote pictures");
+                            writePictures.updatePictures(false);
                             break;
                         case (R.id.all_contacts):
-                            contactIds = writePictures.readPhoneContacts();
-                            Log.d(TAG, "contactIds = " + contactIds);
-                            writePictures.updatePictures(contactIds, false);
-                            Log.d(TAG, "Wrote pictures");
+                            writePictures.updatePictures(false);
                             break;
                         case (R.id.select_contacts):
                             writePictures.launchMultiplePhonePicker();
