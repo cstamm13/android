@@ -11,6 +11,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -60,22 +62,26 @@ public class ListViewLoader extends Activity {
             if (contactIdCursor.getCount() > 0) {
                 List<ContactPair> contactPair = new ArrayList<>();
                 while (contactIdCursor.moveToNext()) {
-                    String contactName = contactIdCursor.getString(
+                    long contactId = contactIdCursor.getLong(
                             contactIdCursor.getColumnIndex(
-                                    ContactsContract.Contacts.DISPLAY_NAME));
+                                    ContactsContract.RawContacts._ID));
+                    String contactName = contactIdCursor.getString(
+                                    contactIdCursor.getColumnIndex(
+                                            ContactsContract.Contacts.DISPLAY_NAME));
                     String contactPhotoString = contactIdCursor.getString(
                             contactIdCursor.getColumnIndex(
                                     ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
                     if (contactPhotoString != null) {
-                        contactPair.add(new ContactPair(contactName, Uri.parse(contactPhotoString)));
+                        contactPair.add(new ContactPair(contactName, Uri.parse(contactPhotoString), contactId, false));
                     } else {
-                        contactPair.add(new ContactPair(contactName, null));
+                        contactPair.add(new ContactPair(contactName, null, contactId, false));
                     }
                 }
 
-                ListViewAdapter adapter = new ListViewAdapter(this, contactPair.toArray(new ContactPair[contactPair.size()]));
+                ListViewAdapter adapter = new ListViewAdapter(this, contactPair.toArray(new ContactPair[contactPair.size()]), contactPair);
                 ListView listView = (ListView) findViewById(R.id.contact_list);
                 listView.setAdapter(adapter);
+                proceedButtonAction(adapter);
             }
 
         } catch (Exception e) {
@@ -83,11 +89,11 @@ public class ListViewLoader extends Activity {
         } finally {
             contactIdCursor.close();
             root.removeView(progressBar);
-            addCancelButton();
+            cancelButtonAction();
         }
     }
 
-    public void addCancelButton() {
+    public void cancelButtonAction() {
         cancelButton = (Button) findViewById(R.id.cancel_selection);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +103,19 @@ public class ListViewLoader extends Activity {
         });
     }
 
-//    @Override
+    public void proceedButtonAction(final ListViewAdapter adapter) {
+        proceedButton = (Button) findViewById(R.id.continue_selection);
+        proceedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<ContactPair> names = adapter.getSelections();
+                for (ContactPair name : names) {
+                    Log.e("proceedButtonAction", "the contact pair ======== " + name.getName() + " selected == " + name.getChecked());
+                }
+            }
+        });
+    }
+
 //    public void onListItemClick(ListView l, View v, int position, long id) {
 //        // Do something when a list item is clicked
 //        l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
