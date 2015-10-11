@@ -1,7 +1,6 @@
 package stammgoodapps.cats;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -11,15 +10,11 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import java.util.ArrayList;
-
-
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
     private RadioGroup radioGroup;
     private RadioButton radioButton;
-    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +27,7 @@ public class MainActivity extends Activity {
     public void addListenerOnButton() {
         final WritePictures writePictures = new WritePictures(this);
 
+        Button button;
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         button = (Button) findViewById(R.id.choice_button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -40,7 +36,6 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 int selectedButton = radioGroup.getCheckedRadioButtonId();
                 radioButton = (RadioButton) findViewById(selectedButton);
-                ArrayList<Uri> contactIds;
 
                 try {
                     switch (radioButton.getId()) {
