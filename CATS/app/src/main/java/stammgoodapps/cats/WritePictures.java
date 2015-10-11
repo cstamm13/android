@@ -11,7 +11,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.os.RemoteException;
@@ -24,7 +23,7 @@ public class WritePictures extends Application {
 
     private Context context;
 
-    public WritePictures (Context context) {
+    public WritePictures(Context context) {
         this.context = context;
     }
 
@@ -118,12 +117,12 @@ public class WritePictures extends Application {
         final String TAG = "readPhoneContacts";
         ArrayList<Uri> contactUris = new ArrayList<>();
         Cursor contactIdCursor =
-                        resolver.query(
-                                ContactsContract.RawContacts.CONTENT_URI,
-                                null,
-                                null,
-                                null,
-                                null);
+                resolver.query(
+                        ContactsContract.RawContacts.CONTENT_URI,
+                        null,
+                        null,
+                        null,
+                        null);
         try {
             if (contactIdCursor.getCount() > 0) {
                 int contactIdColumn = contactIdCursor.getColumnIndex(ContactsContract.RawContacts._ID);
@@ -141,9 +140,10 @@ public class WritePictures extends Application {
 
     public void launchMultiplePhonePicker() {
         final String TAG = "PhonePicker";
-        Intent intent = new Intent(context, ListViewLoader.class);
-        intent.setAction(Intent.ACTION_PICK);
-        intent.putExtra(Intent.EXTRA_PHONE_NUMBER, true);
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setClass(context, LoadingScreen.class);
+        intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
         context.startActivity(intent);
     }
 }
