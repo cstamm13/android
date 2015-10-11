@@ -1,28 +1,19 @@
 package stammgoodapps.cats;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ListViewLoader extends Activity {
-
-    private Button cancelButton;
-    private Button proceedButton;
 
     static final String[] PROJECTION = new String[]{
             ContactsContract.Data._ID,
@@ -35,21 +26,17 @@ public class ListViewLoader extends Activity {
 
     static final String SORT_ORDER = ContactsContract.Data.DISPLAY_NAME;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contact_list);
         final String TAG = "onCreate";
+        populateContactList();
+    }
 
-        ProgressBar progressBar = new ProgressBar(this);
-        progressBar.setLayoutParams(new ActionBar.LayoutParams(
-                ActionBar.LayoutParams.WRAP_CONTENT,
-                ActionBar.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER));
-        progressBar.setIndeterminate(true);
-        ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
-        root.addView(progressBar);
-
+    public void populateContactList() {
+        final String TAG = "populateContactList";
         Cursor contactIdCursor =
                 this.getContentResolver().query(
                         ContactsContract.Contacts.CONTENT_URI,
@@ -66,8 +53,8 @@ public class ListViewLoader extends Activity {
                             contactIdCursor.getColumnIndex(
                                     ContactsContract.RawContacts._ID));
                     String contactName = contactIdCursor.getString(
-                                    contactIdCursor.getColumnIndex(
-                                            ContactsContract.Contacts.DISPLAY_NAME));
+                            contactIdCursor.getColumnIndex(
+                                    ContactsContract.Contacts.DISPLAY_NAME));
                     String contactPhotoString = contactIdCursor.getString(
                             contactIdCursor.getColumnIndex(
                                     ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
@@ -83,17 +70,21 @@ public class ListViewLoader extends Activity {
                 listView.setAdapter(adapter);
                 proceedButtonAction(adapter);
             }
-
         } catch (Exception e) {
             Log.e(TAG, "Threw exception: " + e.getMessage());
         } finally {
             contactIdCursor.close();
-            root.removeView(progressBar);
             cancelButtonAction();
+            try {
+                Thread.sleep(5000, 0);
+            } catch (Exception e) {
+                Log.e(TAG, "Threw exception: " + e.getMessage());
+            }
         }
     }
 
     public void cancelButtonAction() {
+        Button cancelButton;
         cancelButton = (Button) findViewById(R.id.cancel_selection);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +95,7 @@ public class ListViewLoader extends Activity {
     }
 
     public void proceedButtonAction(final ListViewAdapter adapter) {
+        Button proceedButton;
         proceedButton = (Button) findViewById(R.id.continue_selection);
         proceedButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,9 +107,4 @@ public class ListViewLoader extends Activity {
             }
         });
     }
-
-//    public void onListItemClick(ListView l, View v, int position, long id) {
-//        // Do something when a list item is clicked
-//        l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//    }
 }

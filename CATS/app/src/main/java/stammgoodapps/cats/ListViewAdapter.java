@@ -1,10 +1,7 @@
 package stammgoodapps.cats;
 
 import android.app.Activity;
-import android.content.ContentUris;
 import android.content.Context;
-import android.net.Uri;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,12 +28,6 @@ public class ListViewAdapter extends ArrayAdapter<ContactPair> {
         this.list = list;
     }
 
-    static class ViewHolder {
-        TextView contactName;
-        ImageView contactPhoto;
-        CheckBox checkBox;
-    }
-
     List<ContactPair> getSelections() {
         return list;
     }
@@ -53,16 +44,12 @@ public class ListViewAdapter extends ArrayAdapter<ContactPair> {
             viewHolder.contactName = (TextView) view.findViewById(R.id.current_contact_name);
             viewHolder.contactPhoto = (ImageView) view.findViewById(R.id.current_contact_photo);
             viewHolder.checkBox = (CheckBox) view.findViewById(R.id.contact_list_checkbox);
-
             viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
                 @Override
                 public void onCheckedChanged(CompoundButton checkBoxView, boolean isChecked) {
                     int getPosition = (Integer) checkBoxView.getTag();
                     list.get(getPosition).setChecked(checkBoxView.isChecked());
-//                    pairs[position].setChecked(checkBoxView.isChecked());
-//                    list.get(getPosition).setChecked(checkBoxView.isChecked());
-
                 }
             });
 
@@ -76,21 +63,6 @@ public class ListViewAdapter extends ArrayAdapter<ContactPair> {
 
         viewHolder.checkBox.setTag(position);
 
-//        if (pairs[position].getName() != null) {
-//            viewHolder.contactName.setText(pairs[position].getName());
-//        }
-//        if (pairs[position].getPhoto() != null) {
-//            viewHolder.contactPhoto.setImageURI(pairs[position].getPhoto());
-//        } else {
-//            viewHolder.contactPhoto.setImageURI(null);
-//        }
-
-
-
-
-
-
-
         if (list.get(position).getName() != null) {
             viewHolder.contactName.setText(list.get(position).getName());
         }
@@ -100,16 +72,14 @@ public class ListViewAdapter extends ArrayAdapter<ContactPair> {
             viewHolder.contactPhoto.setImageURI(null);
         }
 
-
-
-
-
-
-
-
-
         viewHolder.checkBox.setChecked(list.get(position).getChecked());
 
         return view;
+    }
+
+    static class ViewHolder {
+        TextView contactName;
+        ImageView contactPhoto;
+        CheckBox checkBox;
     }
 }
