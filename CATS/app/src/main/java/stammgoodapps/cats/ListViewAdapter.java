@@ -18,13 +18,11 @@ import java.util.List;
 public class ListViewAdapter extends ArrayAdapter<ContactPair> {
 
     private final Activity context;
-    private final ContactPair[] pairs;
     List<ContactPair> list = new ArrayList<>();
 
     public ListViewAdapter(Activity context, ContactPair[] contacts, List<ContactPair> list) {
         super(context, R.layout.contact_list, contacts);
         this.context = context;
-        this.pairs = contacts;
         this.list = list;
     }
 
