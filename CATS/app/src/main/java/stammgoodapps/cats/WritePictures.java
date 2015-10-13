@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,8 +30,10 @@ public class WritePictures extends Application {
 
     public byte[] getPhoto() {
         final String TAG = "getPhoto";
-        /////make this better somehow
-        int imageResource = R.drawable.first;
+        TypedArray pictures = context.getResources().obtainTypedArray(R.array.loading_images);
+        int choice = (int) (Math.random() * pictures.length());
+        int imageResource = pictures.getResourceId(choice, R.drawable.cats2);
+        pictures.recycle();
         Bitmap picture = BitmapFactory.decodeResource(context.getResources(), imageResource);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         picture.compress(Bitmap.CompressFormat.PNG, 0, stream);
