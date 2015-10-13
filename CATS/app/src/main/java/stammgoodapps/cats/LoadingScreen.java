@@ -9,9 +9,8 @@ import android.view.View;
 
 public class LoadingScreen extends Activity {
 
-    private final int WAIT_TIME = 2500;
-
     public void loadIntent() {
+        final int WAIT_TIME = 2500;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
