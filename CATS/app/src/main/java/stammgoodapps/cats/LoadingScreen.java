@@ -30,7 +30,7 @@ public class LoadingScreen extends Activity {
     }
 
         @Override
-        protected void onCreate (Bundle savedInstanceState){
+        protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.progress_bar);
             findViewById(R.id.progressBar).setVisibility(View.VISIBLE);

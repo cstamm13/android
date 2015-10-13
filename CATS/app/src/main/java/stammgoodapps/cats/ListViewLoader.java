@@ -3,6 +3,7 @@ package stammgoodapps.cats;
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -26,60 +27,70 @@ public class ListViewLoader extends Activity {
 
     static final String SORT_ORDER = ContactsContract.Data.DISPLAY_NAME;
 
+    List<ContactPair> contactPair = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contact_list);
         final String TAG = "onCreate";
-        populateContactList();
+        try {
+            PopulateContactList populateContactList = new PopulateContactList();
+            populateContactList.execute().get();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
-    public void populateContactList() {
-        final String TAG = "populateContactList";
-        Cursor contactIdCursor =
-                this.getContentResolver().query(
-                        ContactsContract.Contacts.CONTENT_URI,
-                        PROJECTION,
-                        SELECTION,
-                        null,
-                        SORT_ORDER);
+    private class PopulateContactList extends AsyncTask<String, Void, List<ContactPair>> {
 
-        try {
-            if (contactIdCursor.getCount() > 0) {
-                List<ContactPair> contactPair = new ArrayList<>();
-                while (contactIdCursor.moveToNext()) {
-                    long contactId = contactIdCursor.getLong(
-                            contactIdCursor.getColumnIndex(
-                                    ContactsContract.RawContacts._ID));
-                    String contactName = contactIdCursor.getString(
-                            contactIdCursor.getColumnIndex(
-                                    ContactsContract.Contacts.DISPLAY_NAME));
-                    String contactPhotoString = contactIdCursor.getString(
-                            contactIdCursor.getColumnIndex(
-                                    ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
-                    if (contactPhotoString != null) {
-                        contactPair.add(new ContactPair(contactName, Uri.parse(contactPhotoString), contactId, false));
-                    } else {
-                        contactPair.add(new ContactPair(contactName, null, contactId, false));
+        @Override
+        protected List<ContactPair> doInBackground(String... contacts) {
+            final String TAG = "populateContactList";
+            Cursor contactIdCursor =
+                    ListViewLoader.this.getContentResolver().query(
+                            ContactsContract.Contacts.CONTENT_URI,
+                            PROJECTION,
+                            SELECTION,
+                            null,
+                            SORT_ORDER);
+
+            try {
+                if (contactIdCursor.getCount() > 0) {
+                    while (contactIdCursor.moveToNext()) {
+                        long contactId = contactIdCursor.getLong(
+                                contactIdCursor.getColumnIndex(
+                                        ContactsContract.RawContacts._ID));
+                        String contactName = contactIdCursor.getString(
+                                contactIdCursor.getColumnIndex(
+                                        ContactsContract.Contacts.DISPLAY_NAME));
+                        String contactPhotoString = contactIdCursor.getString(
+                                contactIdCursor.getColumnIndex(
+                                        ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
+                        if (contactPhotoString != null) {
+                            contactPair.add(new ContactPair(contactName, Uri.parse(contactPhotoString), contactId, false));
+                        } else {
+                            contactPair.add(new ContactPair(contactName, null, contactId, false));
+                        }
                     }
                 }
-
-                ListViewAdapter adapter = new ListViewAdapter(this, contactPair.toArray(new ContactPair[contactPair.size()]), contactPair);
-                ListView listView = (ListView) findViewById(R.id.contact_list);
-                listView.setAdapter(adapter);
-                proceedButtonAction(adapter);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Threw exception: " + e.getMessage());
-        } finally {
-            contactIdCursor.close();
-            cancelButtonAction();
-            try {
-                Thread.sleep(5000, 0);
             } catch (Exception e) {
                 Log.e(TAG, "Threw exception: " + e.getMessage());
+            } finally {
+                contactIdCursor.close();
+                cancelButtonAction();
             }
+            Log.e(TAG, "contact pair ======== " + contactPair);
+            return contactPair;
+        }
+
+        @Override
+        protected void onPostExecute(List<ContactPair> contactPair) {
+            ListViewAdapter adapter = new ListViewAdapter(ListViewLoader.this, contactPair.toArray(new ContactPair[contactPair.size()]), contactPair);
+            ListView listView = (ListView) findViewById(R.id.contact_list);
+            listView.setAdapter(adapter);
+            proceedButtonAction(adapter);
+            cancelButtonAction();
         }
     }
 
