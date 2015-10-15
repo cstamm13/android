@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.os.RemoteException;
@@ -92,26 +93,36 @@ public class WritePictures extends Application {
         return ops;
     }
 
-    public void updatePictures(boolean allContacts)
-            throws RemoteException, OperationApplicationException, IndexOutOfBoundsException {
-        final ContentResolver resolver = context.getContentResolver();
-        final String TAG = "updatePictures";
-        ArrayList<Uri> rawContactUris = readPhoneContacts();
+    private class UpdatePictures extends AsyncTask<Boolean, Void, Boolean> {
+        //    public void updatePictures(boolean allContacts)
+        @Override
+        protected Boolean doInBackground(Boolean... allContacts)
+                throws IndexOutOfBoundsException {
+            final ContentResolver resolver = context.getContentResolver();
+            final String TAG = "updatePictures";
+            ArrayList<Uri> rawContactUris = readPhoneContacts();
 
-        for (Uri rawContactUri : rawContactUris) {
+            for (Uri rawContactUri : rawContactUris) {
 
-            int photoRow = getPhotoRow(rawContactUri, allContacts);
-            ContentValues contactContentValues = buildContactContentValues(rawContactUri);
-            if (photoRow >= 0) {
-                resolver.update(
-                        ContactsContract.Data.CONTENT_URI,
-                        contactContentValues,
-                        ContactsContract.Data._ID + " = " + photoRow, null);
-            } else {
-                resolver.insert(
-                        ContactsContract.Data.CONTENT_URI,
-                        contactContentValues);
+                int photoRow = getPhotoRow(rawContactUri, allContacts[0]);
+                ContentValues contactContentValues = buildContactContentValues(rawContactUri);
+                if (photoRow >= 0) {
+                    resolver.update(
+                            ContactsContract.Data.CONTENT_URI,
+                            contactContentValues,
+                            ContactsContract.Data._ID + " = " + photoRow, null);
+                } else {
+                    resolver.insert(
+                            ContactsContract.Data.CONTENT_URI,
+                            contactContentValues);
+                }
             }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            //load next view, but figure out what that is first
         }
     }
 
