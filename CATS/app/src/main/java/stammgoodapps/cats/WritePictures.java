@@ -1,32 +1,40 @@
 package stammgoodapps.cats;
 
-import android.app.Application;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
-import android.os.RemoteException;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
-public class WritePictures extends Application {
+public class WritePictures extends Activity {
 
-    private Context context;
+    private Context context = WritePictures.this;
+    private Boolean allContacts;
 
-    public WritePictures(Context context) {
-        this.context = context;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle extras = getIntent().getExtras();
+        this.allContacts = extras.getBoolean("allContacts");
+        try {
+            UpdatePictures updatePictures = new UpdatePictures();
+            updatePictures.execute(allContacts).get();
+        } catch (Exception e) {
+            Log.e("onCreate", e.getMessage());
+        }
     }
 
     public byte[] getPhoto() {
@@ -41,7 +49,7 @@ public class WritePictures extends Application {
         return stream.toByteArray();
     }
 
-    public int getPhotoRow(Uri rawContactUri, boolean allContacts) {
+    public int getPhotoRow(Uri rawContactUri) {
 
         final ContentResolver resolver = context.getContentResolver();
         int photoRow = -1;
@@ -94,17 +102,16 @@ public class WritePictures extends Application {
     }
 
     private class UpdatePictures extends AsyncTask<Boolean, Void, Boolean> {
-        //    public void updatePictures(boolean allContacts)
         @Override
         protected Boolean doInBackground(Boolean... allContacts)
                 throws IndexOutOfBoundsException {
-            final ContentResolver resolver = context.getContentResolver();
+
             final String TAG = "updatePictures";
+            final ContentResolver resolver = context.getContentResolver();
             ArrayList<Uri> rawContactUris = readPhoneContacts();
 
             for (Uri rawContactUri : rawContactUris) {
-
-                int photoRow = getPhotoRow(rawContactUri, allContacts[0]);
+                int photoRow = getPhotoRow(rawContactUri);
                 ContentValues contactContentValues = buildContactContentValues(rawContactUri);
                 if (photoRow >= 0) {
                     resolver.update(
@@ -150,14 +157,5 @@ public class WritePictures extends Application {
             contactIdCursor.close();
         }
         return contactUris;
-    }
-
-    public void launchMultiplePhonePicker() {
-        final String TAG = "PhonePicker";
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setClass(context, LoadingScreen.class);
-        intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
-        context.startActivity(intent);
     }
 }

@@ -19,6 +19,7 @@ public class LoadingScreen extends Activity {
                     String classname = extras.getString("class");
                     Class<?> clazz = Class.forName(classname);
                     Intent progressIntent = new Intent(LoadingScreen.this.getApplicationContext(), clazz);
+                    progressIntent.putExtra("allContacts", extras.getBoolean("allContacts"));
                     LoadingScreen.this.startActivity(progressIntent);
                     LoadingScreen.this.finish();
                 } catch (Exception e) {
