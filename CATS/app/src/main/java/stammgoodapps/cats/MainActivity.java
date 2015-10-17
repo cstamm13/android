@@ -1,6 +1,7 @@
 package stammgoodapps.cats;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,7 +26,6 @@ public class MainActivity extends Activity {
 
 
     public void addListenerOnButton() {
-        final WritePictures writePictures = new WritePictures(this);
 
         Button button;
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
@@ -36,24 +36,31 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 int selectedButton = radioGroup.getCheckedRadioButtonId();
                 radioButton = (RadioButton) findViewById(selectedButton);
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setClass(MainActivity.this, LoadingScreen.class);
 
                 try {
                     switch (radioButton.getId()) {
                         case (R.id.no_photo):
-                            writePictures.updatePictures(false);
+                            intent.putExtra("class", "stammgoodapps.cats.WritePictures");
+                            intent.putExtra("allContacts", false);
+                            MainActivity.this.startActivity(intent);
                             break;
                         case (R.id.all_contacts):
-                            writePictures.updatePictures(false);
+                            intent.putExtra("class", "stammgoodapps.cats.WritePictures");
+                            intent.putExtra("allContacts", true);
+                            MainActivity.this.startActivity(intent);
                             break;
                         case (R.id.select_contacts):
-                            writePictures.launchMultiplePhonePicker();
+                            intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
+                            MainActivity.this.startActivity(intent);
+                            intent.putExtra("allContacts", false);
                             break;
-
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "Threw Exception: " + e.getMessage());
                 }
-
             }
         });
 
