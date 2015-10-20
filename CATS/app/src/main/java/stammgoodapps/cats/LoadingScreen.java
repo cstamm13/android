@@ -10,6 +10,7 @@ import android.view.View;
 public class LoadingScreen extends Activity {
 
     public void loadIntent() {
+        final String TAG = "LoadingScreen.loadIntent";
         final int WAIT_TIME = 2500;
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -22,8 +23,8 @@ public class LoadingScreen extends Activity {
                     progressIntent.putExtra("allContacts", extras.getBoolean("allContacts"));
                     LoadingScreen.this.startActivity(progressIntent);
                     LoadingScreen.this.finish();
-                } catch (Exception e) {
-                    Log.e("error", e.getMessage());
+                } catch (ClassNotFoundException e) {
+                    Log.e(TAG, e.getMessage());
                 }
             }
         }, WAIT_TIME);

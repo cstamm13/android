@@ -18,6 +18,7 @@ import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class WritePictures extends Activity {
 
@@ -27,25 +28,30 @@ public class WritePictures extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final String TAG = "WritePictures.onCreate";
         Bundle extras = getIntent().getExtras();
         this.allContacts = extras.getBoolean("allContacts");
         try {
             UpdatePictures updatePictures = new UpdatePictures();
             updatePictures.execute(allContacts).get();
-        } catch (Exception e) {
-            Log.e("onCreate", e.getMessage());
+        } catch (InterruptedException | ExecutionException e) {
+            Log.e(TAG, "Threw error: " + e.getMessage());
         }
     }
 
     public byte[] getPhoto() {
         final String TAG = "getPhoto";
-        TypedArray pictures = context.getResources().obtainTypedArray(R.array.loading_images);
-        int choice = (int) (Math.random() * pictures.length());
-        int imageResource = pictures.getResourceId(choice, R.drawable.cats2);
-        pictures.recycle();
-        Bitmap picture = BitmapFactory.decodeResource(context.getResources(), imageResource);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        picture.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        try {
+            TypedArray pictures = context.getResources().obtainTypedArray(R.array.loading_images);
+            int choice = (int) (Math.random() * pictures.length());
+            int imageResource = pictures.getResourceId(choice, R.drawable.cats2);
+            pictures.recycle();
+            Bitmap picture = BitmapFactory.decodeResource(context.getResources(), imageResource);
+            picture.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        } catch (Exception e) {
+            Log.e(TAG, "Threw error: " + e.getMessage());
+        }
         return stream.toByteArray();
     }
 
@@ -103,26 +109,30 @@ public class WritePictures extends Activity {
 
     private class UpdatePictures extends AsyncTask<Boolean, Void, Boolean> {
         @Override
-        protected Boolean doInBackground(Boolean... allContacts)
-                throws IndexOutOfBoundsException {
+        protected Boolean doInBackground(Boolean... allContacts) {
 
             final String TAG = "updatePictures";
-            final ContentResolver resolver = context.getContentResolver();
-            ArrayList<Uri> rawContactUris = readPhoneContacts();
 
-            for (Uri rawContactUri : rawContactUris) {
-                int photoRow = getPhotoRow(rawContactUri);
-                ContentValues contactContentValues = buildContactContentValues(rawContactUri);
-                if (photoRow >= 0) {
-                    resolver.update(
-                            ContactsContract.Data.CONTENT_URI,
-                            contactContentValues,
-                            ContactsContract.Data._ID + " = " + photoRow, null);
-                } else {
-                    resolver.insert(
-                            ContactsContract.Data.CONTENT_URI,
-                            contactContentValues);
+            try {
+                final ContentResolver resolver = context.getContentResolver();
+                ArrayList<Uri> rawContactUris = readPhoneContacts();
+
+                for (Uri rawContactUri : rawContactUris) {
+                    int photoRow = getPhotoRow(rawContactUri);
+                    ContentValues contactContentValues = buildContactContentValues(rawContactUri);
+                    if (photoRow >= 0) {
+                        resolver.update(
+                                ContactsContract.Data.CONTENT_URI,
+                                contactContentValues,
+                                ContactsContract.Data._ID + " = " + photoRow, null);
+                    } else {
+                        resolver.insert(
+                                ContactsContract.Data.CONTENT_URI,
+                                contactContentValues);
+                    }
                 }
+            } catch (Exception e) {
+                Log.e(TAG, "Threw error: " + e.getMessage());
             }
             return true;
         }
@@ -135,16 +145,15 @@ public class WritePictures extends Activity {
 
     public ArrayList<Uri> readPhoneContacts() {
         final ContentResolver resolver = context.getContentResolver();
-        final String TAG = "readPhoneContacts";
+        final String TAG = "WritePictures.readPhoneContacts";
         ArrayList<Uri> contactUris = new ArrayList<>();
-        Cursor contactIdCursor =
-                resolver.query(
-                        ContactsContract.RawContacts.CONTENT_URI,
-                        null,
-                        null,
-                        null,
-                        null);
-        try {
+        try (Cursor contactIdCursor =
+                     resolver.query(
+                             ContactsContract.RawContacts.CONTENT_URI,
+                             null,
+                             null,
+                             null,
+                             null)) {
             if (contactIdCursor.getCount() > 0) {
                 int contactIdColumn = contactIdCursor.getColumnIndex(ContactsContract.RawContacts._ID);
                 while (contactIdCursor.moveToNext()) {
@@ -153,8 +162,8 @@ public class WritePictures extends Activity {
                     contactUris.add(contactUri);
                 }
             }
-        } finally {
-            contactIdCursor.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Threw error: " + e.getMessage());
         }
         return contactUris;
     }
