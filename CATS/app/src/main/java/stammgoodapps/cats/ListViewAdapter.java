@@ -33,9 +33,11 @@ public class ListViewAdapter extends ArrayAdapter<ContactPair> {
     @Override
     public View getView(final int position, View view, ViewGroup parent) {
 
+        final String TAG = "getView";
         final ViewHolder viewHolder;
 
         if (view == null) {
+            Log.e(TAG, "View was null.");
             viewHolder = new ViewHolder();
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.contact_list_entry, null);
@@ -56,6 +58,7 @@ public class ListViewAdapter extends ArrayAdapter<ContactPair> {
             view.setTag(R.id.current_contact_photo, viewHolder.contactPhoto);
             view.setTag(R.id.contact_list_checkbox, viewHolder.checkBox);
         } else {
+            Log.e(TAG, "View was NOT null. Balls.");
             viewHolder = (ViewHolder) view.getTag();
         }
 

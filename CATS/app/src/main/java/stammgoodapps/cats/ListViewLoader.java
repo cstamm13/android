@@ -11,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +57,6 @@ public class ListViewLoader extends Activity {
                             SELECTION,
                             null,
                             SORT_ORDER);
-
             try {
                 if (contactIdCursor.getCount() > 0) {
                     while (contactIdCursor.moveToNext()) {
@@ -89,6 +91,9 @@ public class ListViewLoader extends Activity {
             ListViewAdapter adapter = new ListViewAdapter(ListViewLoader.this, contactPair.toArray(new ContactPair[contactPair.size()]), contactPair);
             ListView listView = (ListView) findViewById(R.id.contact_list);
             listView.setAdapter(adapter);
+            PublisherAdView mPublisherAdView = (PublisherAdView) findViewById(R.id.publisherAdView);
+            PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
+            mPublisherAdView.loadAd(adRequest);
             proceedButtonAction(adapter);
             cancelButtonAction();
         }
@@ -112,9 +117,8 @@ public class ListViewLoader extends Activity {
             @Override
             public void onClick(View v) {
                 List<ContactPair> names = adapter.getSelections();
-                for (ContactPair name : names) {
-                    Log.e("proceedButtonAction", "the contact pair ======== " + name.getName() + " selected == " + name.getChecked());
-                }
+                WritePictures writePictures = new WritePictures();
+
             }
         });
     }
