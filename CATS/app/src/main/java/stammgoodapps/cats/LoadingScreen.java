@@ -10,8 +10,9 @@ import android.view.View;
 public class LoadingScreen extends Activity {
 
     public void loadIntent() {
-        final String TAG = "LoadingScreen.loadIntent";
+        final String TAG = "loadIntent";
         final int WAIT_TIME = 2500;
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -21,6 +22,7 @@ public class LoadingScreen extends Activity {
                     Class<?> clazz = Class.forName(classname);
                     Intent progressIntent = new Intent(LoadingScreen.this.getApplicationContext(), clazz);
                     progressIntent.putExtra("allContacts", extras.getBoolean("allContacts"));
+                    progressIntent.putStringArrayListExtra("selectedContacts", extras.getStringArrayList("selectedContacts"));
                     LoadingScreen.this.startActivity(progressIntent);
                     LoadingScreen.this.finish();
                 } catch (ClassNotFoundException e) {
@@ -30,11 +32,11 @@ public class LoadingScreen extends Activity {
         }, WAIT_TIME);
     }
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.progress_bar);
-            findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-            loadIntent();
-        }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.progress_bar);
+        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        loadIntent();
+    }
 }

@@ -24,16 +24,28 @@ public class WritePictures extends Activity {
 
     private Context context = WritePictures.this;
     private Boolean allContacts;
+    private ArrayList<String> contactList;
+
+    public void setContactList(ArrayList<String> contactList) {
+        this.contactList = contactList;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final String TAG = "WritePictures.onCreate";
-        Bundle extras = getIntent().getExtras();
-        this.allContacts = extras.getBoolean("allContacts");
         try {
+            Bundle extras = getIntent().getExtras();
+            this.allContacts = extras.getBoolean("allContacts");
+            if (extras.getParcelableArrayList("selectedContacts") == null) {
+                setContactList(readPhoneContacts());
+            } else {
+                setContactList(extras.getStringArrayList("selectedContacts"));
+            }
+
             UpdatePictures updatePictures = new UpdatePictures();
-            updatePictures.execute(allContacts).get();
+            updatePictures.execute().get();
+
         } catch (InterruptedException | ExecutionException e) {
             Log.e(TAG, "Threw error: " + e.getMessage());
         }
@@ -107,6 +119,31 @@ public class WritePictures extends Activity {
         return ops;
     }
 
+    public ArrayList<String> readPhoneContacts() {
+        final ContentResolver resolver = context.getContentResolver();
+        final String TAG = "WritePictures.readPhoneContacts";
+        ArrayList<String> contactUris = new ArrayList<>();
+        try (Cursor contactIdCursor =
+                     resolver.query(
+                             ContactsContract.RawContacts.CONTENT_URI,
+                             null,
+                             null,
+                             null,
+                             null)) {
+            if (contactIdCursor.getCount() > 0) {
+                int contactIdColumn = contactIdCursor.getColumnIndex(ContactsContract.RawContacts._ID);
+                while (contactIdCursor.moveToNext()) {
+                    long contactId = contactIdCursor.getLong(contactIdColumn);
+                    Uri contactUri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI, contactId);
+                    contactUris.add(contactUri.toString());
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Threw error: " + e.getMessage());
+        }
+        return contactUris;
+    }
+
     private class UpdatePictures extends AsyncTask<Boolean, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Boolean... allContacts) {
@@ -115,9 +152,10 @@ public class WritePictures extends Activity {
 
             try {
                 final ContentResolver resolver = context.getContentResolver();
-                ArrayList<Uri> rawContactUris = readPhoneContacts();
-
-                for (Uri rawContactUri : rawContactUris) {
+                Log.e("stuff", "THERE ARE THINGS HERE LOOK AT ME");
+                for (String rawContactUris : contactList) {
+                    Uri rawContactUri = Uri.parse(rawContactUris);
+                    Log.e(TAG, "contactList uri ======= " + rawContactUris);
                     int photoRow = getPhotoRow(rawContactUri);
                     ContentValues contactContentValues = buildContactContentValues(rawContactUri);
                     if (photoRow >= 0) {
@@ -141,30 +179,5 @@ public class WritePictures extends Activity {
         protected void onPostExecute(Boolean result) {
             //load next view, but figure out what that is first
         }
-    }
-
-    public ArrayList<Uri> readPhoneContacts() {
-        final ContentResolver resolver = context.getContentResolver();
-        final String TAG = "WritePictures.readPhoneContacts";
-        ArrayList<Uri> contactUris = new ArrayList<>();
-        try (Cursor contactIdCursor =
-                     resolver.query(
-                             ContactsContract.RawContacts.CONTENT_URI,
-                             null,
-                             null,
-                             null,
-                             null)) {
-            if (contactIdCursor.getCount() > 0) {
-                int contactIdColumn = contactIdCursor.getColumnIndex(ContactsContract.RawContacts._ID);
-                while (contactIdCursor.moveToNext()) {
-                    long contactId = contactIdCursor.getLong(contactIdColumn);
-                    Uri contactUri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI, contactId);
-                    contactUris.add(contactUri);
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Threw error: " + e.getMessage());
-        }
-        return contactUris;
     }
 }

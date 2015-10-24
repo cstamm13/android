@@ -52,17 +52,20 @@ public class MainActivity extends Activity {
                         case (R.id.no_photo):
                             intent.putExtra("class", "stammgoodapps.cats.WritePictures");
                             intent.putExtra("allContacts", false);
+                            intent.putExtra("selected", false);
                             MainActivity.this.startActivity(intent);
                             break;
                         case (R.id.all_contacts):
                             intent.putExtra("class", "stammgoodapps.cats.WritePictures");
                             intent.putExtra("allContacts", true);
+                            intent.putExtra("selected", false);
                             MainActivity.this.startActivity(intent);
                             break;
                         case (R.id.select_contacts):
                             intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
                             MainActivity.this.startActivity(intent);
                             intent.putExtra("allContacts", false);
+                            intent.putExtra("selected", true);
                             break;
                     }
                 } catch (Exception e) {
