@@ -18,12 +18,14 @@ import java.util.List;
 public class ListViewAdapter extends ArrayAdapter<ContactPair> {
 
     private final Activity context;
+    private boolean showCheckbox;
     List<ContactPair> list = new ArrayList<>();
 
-    public ListViewAdapter(Activity context, ContactPair[] contacts, List<ContactPair> list) {
+    public ListViewAdapter(Activity context, ContactPair[] contacts, List<ContactPair> list, boolean showCheckbox) {
         super(context, R.layout.contact_list, contacts);
         this.context = context;
         this.list = list;
+        this.showCheckbox = showCheckbox;
     }
 
     List<ContactPair> getSelections() {
@@ -37,7 +39,6 @@ public class ListViewAdapter extends ArrayAdapter<ContactPair> {
         final ViewHolder viewHolder;
 
         if (view == null) {
-            Log.e(TAG, "View was null.");
             viewHolder = new ViewHolder();
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.contact_list_entry, null);
@@ -58,8 +59,11 @@ public class ListViewAdapter extends ArrayAdapter<ContactPair> {
             view.setTag(R.id.current_contact_photo, viewHolder.contactPhoto);
             view.setTag(R.id.contact_list_checkbox, viewHolder.checkBox);
         } else {
-            Log.e(TAG, "View was NOT null. Balls.");
             viewHolder = (ViewHolder) view.getTag();
+        }
+
+        if (!showCheckbox) {
+            viewHolder.checkBox.setVisibility(View.INVISIBLE);
         }
 
         viewHolder.checkBox.setTag(position);

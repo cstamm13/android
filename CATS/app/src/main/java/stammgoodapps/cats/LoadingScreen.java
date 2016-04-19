@@ -9,7 +9,13 @@ import android.view.View;
 
 public class LoadingScreen extends Activity {
 
-    public void loadIntent() {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.progress_bar);
+        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        final Bundle extras = getIntent().getExtras();
+        final String classname = extras.getString("class");
         final String TAG = "loadIntent";
         final int WAIT_TIME = 2500;
 
@@ -17,11 +23,9 @@ public class LoadingScreen extends Activity {
             @Override
             public void run() {
                 try {
-                    Bundle extras = getIntent().getExtras();
-                    String classname = extras.getString("class");
-                    Class<?> clazz = Class.forName(classname);
-                    Intent progressIntent = new Intent(LoadingScreen.this.getApplicationContext(), clazz);
+                    Intent progressIntent = new Intent(LoadingScreen.this.getApplicationContext(), Class.forName(classname));
                     progressIntent.putExtra("allContacts", extras.getBoolean("allContacts"));
+                    progressIntent.putExtra("selecting", extras.getBoolean("selecting"));
                     progressIntent.putStringArrayListExtra("selectedContacts", extras.getStringArrayList("selectedContacts"));
                     LoadingScreen.this.startActivity(progressIntent);
                     LoadingScreen.this.finish();
@@ -30,13 +34,5 @@ public class LoadingScreen extends Activity {
                 }
             }
         }, WAIT_TIME);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.progress_bar);
-        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-        loadIntent();
     }
 }

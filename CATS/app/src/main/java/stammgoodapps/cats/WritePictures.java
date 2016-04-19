@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -177,7 +178,13 @@ public class WritePictures extends Activity {
 
         @Override
         protected void onPostExecute(Boolean result) {
-            //load next view, but figure out what that is first
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setClass(WritePictures.this, LoadingScreen.class);
+            intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
+            WritePictures.this.startActivity(intent);
+            intent.putExtra("allContacts", false);
+            intent.putExtra("selecting", false);
         }
     }
 }

@@ -34,12 +34,16 @@ public class ListViewLoader extends Activity {
 
     List<ContactPair> contactPair = new ArrayList<>();
     ArrayList<String> selectedContacts = new ArrayList<>();
+    private boolean selecting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.contact_list);
         final String TAG = "onCreate";
+
+        Bundle extras = getIntent().getExtras();
+        this.selecting = extras.getBoolean("selecting");
+        setContentView(R.layout.contact_list);
         try {
             PopulateContactList populateContactList = new PopulateContactList();
             populateContactList.execute().get();
@@ -68,7 +72,31 @@ public class ListViewLoader extends Activity {
                 List<ContactPair> names = adapter.getSelections();
                 for (ContactPair name : names) {
                     if (name.getChecked()) {
-                        Log.e("stuff", "the checked name ===== " + name.getName());
+                        Uri contactUri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI, name.getId());
+                        selectedContacts.add(contactUri.toString());
+                    }
+                }
+
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setClass(ListViewLoader.this, LoadingScreen.class);
+                intent.putExtra("class", "stammgoodapps.cats.WritePictures");
+                intent.putExtra("allContacts", true);
+                intent.putStringArrayListExtra("selectedContacts", selectedContacts);
+                ListViewLoader.this.startActivity(intent);
+            }
+        });
+    }
+
+    public void continueWithChangedPhotos(final ListViewAdapter adapter) {
+        Button proceedButton;
+        proceedButton = (Button) findViewById(R.id.continue_selection);
+        proceedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<ContactPair> names = adapter.getSelections();
+                for (ContactPair name : names) {
+                    if (name.getChecked()) {
                         Uri contactUri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI, name.getId());
                         selectedContacts.add(contactUri.toString());
                     }
@@ -126,14 +154,25 @@ public class ListViewLoader extends Activity {
 
         @Override
         protected void onPostExecute(List<ContactPair> contactPair) {
-            ListViewAdapter adapter = new ListViewAdapter(ListViewLoader.this, contactPair.toArray(new ContactPair[contactPair.size()]), contactPair);
-            ListView listView = (ListView) findViewById(R.id.contact_list);
-            listView.setAdapter(adapter);
-            PublisherAdView mPublisherAdView = (PublisherAdView) findViewById(R.id.publisherAdView);
-            PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
-            mPublisherAdView.loadAd(adRequest);
-            proceedButtonAction(adapter);
-            cancelButtonAction();
+            if (selecting) {
+                ListViewAdapter adapter = new ListViewAdapter(ListViewLoader.this, contactPair.toArray(new ContactPair[contactPair.size()]), contactPair, true);
+                ListView listView = (ListView) findViewById(R.id.contact_list);
+                listView.setAdapter(adapter);
+                PublisherAdView mPublisherAdView = (PublisherAdView) findViewById(R.id.publisherAdView);
+                PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
+                mPublisherAdView.loadAd(adRequest);
+                proceedButtonAction(adapter);
+                cancelButtonAction();
+            } else {
+                ListViewAdapter adapter = new ListViewAdapter(ListViewLoader.this, contactPair.toArray(new ContactPair[contactPair.size()]), contactPair, false);
+                ListView listView = (ListView) findViewById(R.id.contact_list);
+                listView.setAdapter(adapter);
+                PublisherAdView mPublisherAdView = (PublisherAdView) findViewById(R.id.publisherAdView);
+                PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
+                mPublisherAdView.loadAd(adRequest);
+                cancelButtonAction();
+
+            }
         }
     }
 }

@@ -59,17 +59,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             ads:adSize="BANNER"
-            ads:adUnitId="@string/banner_ad_unit_id"></com.google.android.gms.ads.doubleclick.PublisherAdView>
+            ads:adUnitId="@string/banner_ad_unit_id" />
     </RelativeLayout>
-
-    <!--<com.google.android.gms.ads.doubleclick.PublisherAdView>-->
-    <!--android:id="@+id/publisherAdView"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center|bottom"-->
-    <!--ads:adSize="BANNER"-->
-    <!--ads:adUnitId="@string/banner_ad_unit_id">-->
-    <!--</com.google.android.gms.ads.doubleclick.PublisherAdView>-->
-
 
 </LinearLayout>

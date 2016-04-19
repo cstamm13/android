@@ -33,7 +33,6 @@ public class MainActivity extends Activity {
 
 
     public void addListenerOnButton() {
-
         Button button;
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         button = (Button) findViewById(R.id.choice_button);
@@ -52,20 +51,19 @@ public class MainActivity extends Activity {
                         case (R.id.no_photo):
                             intent.putExtra("class", "stammgoodapps.cats.WritePictures");
                             intent.putExtra("allContacts", false);
-                            intent.putExtra("selected", false);
+                            intent.putExtra("selecting", false);
                             MainActivity.this.startActivity(intent);
                             break;
                         case (R.id.all_contacts):
                             intent.putExtra("class", "stammgoodapps.cats.WritePictures");
                             intent.putExtra("allContacts", true);
-                            intent.putExtra("selected", false);
+                            intent.putExtra("selecting", false);
                             MainActivity.this.startActivity(intent);
                             break;
                         case (R.id.select_contacts):
                             intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
+                            intent.putExtra("selecting", true);
                             MainActivity.this.startActivity(intent);
-                            intent.putExtra("allContacts", false);
-                            intent.putExtra("selected", true);
                             break;
                     }
                 } catch (Exception e) {
@@ -94,9 +92,14 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case R.id.cat_of_the_day:
+                CatOfTheDay catOfTheDay = new CatOfTheDay();
+                return true;
+            case R.id.about:
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
