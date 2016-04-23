@@ -10,8 +10,7 @@
         android:id="@+id/cat_of_the_day"
         android:orderInCategory="200"
         android:showAsAction="collapseActionView"
-        android:title="@string/cat_of_the_day"
-        android:onClick=""/>
+        android:title="@string/cat_of_the_day" />
     <item
         android:id="@+id/about"
         android:orderInCategory="300"
