@@ -116,7 +116,7 @@ public class ListViewLoader extends Activity {
     private class PopulateContactList extends AsyncTask<String, Void, List<ContactPair>> {
 
         @Override
-        protected List<ContactPair> doInBackground(String... contacts) {
+        protected List<ContactPair> doInBackground(String... contacts) throws NullPointerException {
             final String TAG = "populateContactList";
 
             try (Cursor contactIdCursor =
@@ -143,8 +143,11 @@ public class ListViewLoader extends Activity {
                             contactPair.add(new ContactPair(contactName, null, contactId, false));
                         }
                     }
+                } else {
+                    Log.i(TAG, "No contacts were found");
+                    contactPair = null;
                 }
-            } catch (Exception e) {
+            } catch (NullPointerException e) {
                 Log.e(TAG, "Threw exception: " + e.getMessage());
             } finally {
                 cancelButtonAction();
