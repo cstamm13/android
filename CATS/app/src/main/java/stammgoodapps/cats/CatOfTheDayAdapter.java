@@ -2,27 +2,39 @@ package stammgoodapps.cats;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
+public class CatOfTheDayAdapter extends BaseAdapter {
 
-public class CatOfTheDayAdapter extends Activity {
+    private final Activity context;
 
-    private Context context = CatOfTheDayAdapter.this;
+    private Bitmap mImgs;
 
-    public String getDate() {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy", Locale.US);
-        return dateFormat.format(calendar.getTime());
+    public CatOfTheDayAdapter(Activity context, Bitmap imgs) {
+        super();
+        this.context = context;
+        mImgs = imgs;
     }
 
-    public void getCatOfDay() {
+    @Override
+    public int getCount() {
+        return 1;
+    }
 
+    @Override
+    public Object getItem(int position) {
+        return 0;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
@@ -36,12 +48,13 @@ public class CatOfTheDayAdapter extends Activity {
             view = inflater.inflate(R.layout.cat_of_the_day, null);
             viewHolder.catOfTheDayPhoto = (ImageView) view.findViewById(R.id.cat_of_the_day_photo);
             view.setTag(R.id.cat_of_the_day_photo, viewHolder.catOfTheDayPhoto);
-
         } else {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        viewHolder.catOfTheDayPhoto.setImageURI();
+        viewHolder.catOfTheDayPhoto.setImageBitmap(mImgs);
+
+        return view;
     }
 
     static class ViewHolder {

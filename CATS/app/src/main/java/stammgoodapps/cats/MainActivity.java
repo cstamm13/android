@@ -90,13 +90,17 @@ public class MainActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setClass(MainActivity.this, LoadingScreen.class);
 
         switch (item.getItemId()) {
             case R.id.action_settings:
                 return true;
             case R.id.cat_of_the_day:
-                CatOfTheDay catOfTheDay = new CatOfTheDay();
+                intent.putExtra("class", "stammgoodapps.cats.CatOfTheDayLoader");
+                MainActivity.this.startActivity(intent);
+//                startActivity(new Intent(this, CatOfTheDayAdapter.class));
                 return true;
             case R.id.about:
                 return true;
