@@ -5,20 +5,41 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:theme="@android:style/Theme.Material"
+    android:gravity="center"
     tools:context=".CatOfTheDayLoader">
 
     <ListView
         android:id="@+id/cat_of_the_day_list_view"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:clickable="true"
         android:fadeScrollbars="true"
         android:footerDividersEnabled="true"
         android:foregroundGravity="center"
         android:scrollbars="vertical"
         android:scrollingCache="true"
         android:visibility="visible" />
+
+
+    <LinearLayout
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:theme="@android:style/Theme.Material">
+
+        <Button
+            android:id="@+id/cat_of_the_day_link"
+            style="@android:style/TextAppearance.Material.Widget.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/view_on_site"/>
+    </LinearLayout>
 
     <RelativeLayout
         xmlns:ads="http://schemas.android.com/apk/res-auto"
