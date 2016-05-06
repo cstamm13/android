@@ -62,6 +62,7 @@ public class MainActivity extends Activity {
                             break;
                         case (R.id.select_contacts):
                             intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
+                            intent.putExtra("allContacts", false);
                             intent.putExtra("selecting", true);
                             MainActivity.this.startActivity(intent);
                             break;
@@ -100,7 +101,6 @@ public class MainActivity extends Activity {
             case R.id.cat_of_the_day:
                 intent.putExtra("class", "stammgoodapps.cats.CatOfTheDayLoader");
                 MainActivity.this.startActivity(intent);
-//                startActivity(new Intent(this, CatOfTheDayAdapter.class));
                 return true;
             case R.id.about:
                 return true;
