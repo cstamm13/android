@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="loading_images">
-        <item>@drawable/cats1</item>
-        <item>@drawable/cats2</item>
+        <item>@drawable/cat1</item>
+        <item>@drawable/cat2</item>
+        <item>@drawable/cat3</item>
+        <item>@drawable/cat4</item>
+        <item>@drawable/cat5</item>
+        <item>@drawable/cat6</item>
+        <item>@drawable/cat7</item>
+        <item>@drawable/cat8</item>
+        <item>@drawable/cat9</item>
+        <item>@drawable/cat10</item>
+        <item>@drawable/cat11</item>
+        <item>@drawable/cat12</item>
+        <item>@drawable/cat13</item>
+        <item>@drawable/cat14</item>
+        <item>@drawable/cat15</item>
+        <item>@drawable/cat16</item>
+        <item>@drawable/cat17</item>
+        <item>@drawable/cat18</item>
     </array>
 </resources>
