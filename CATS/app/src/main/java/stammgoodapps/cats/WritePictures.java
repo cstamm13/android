@@ -17,14 +17,15 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.ExecutionException;
 
 public class WritePictures extends Activity {
 
     private Context context = WritePictures.this;
-    private Boolean allContacts;
+    public Boolean allContacts;
+    public Boolean selecting;
     private ArrayList<String> contactList;
 
     public void setContactList(ArrayList<String> contactList) {
@@ -38,6 +39,7 @@ public class WritePictures extends Activity {
         try {
             Bundle extras = getIntent().getExtras();
             this.allContacts = extras.getBoolean("allContacts");
+            this.selecting = extras.getBoolean("selecting");
             if (extras.getParcelableArrayList("selectedContacts") == null) {
                 setContactList(readPhoneContacts());
             } else {
@@ -58,7 +60,7 @@ public class WritePictures extends Activity {
         try {
             TypedArray pictures = context.getResources().obtainTypedArray(R.array.loading_images);
             int choice = (int) (Math.random() * pictures.length());
-            int imageResource = pictures.getResourceId(choice, R.drawable.cats2);
+            int imageResource = pictures.getResourceId(choice, R.drawable.cat1);
             pictures.recycle();
             Bitmap picture = BitmapFactory.decodeResource(context.getResources(), imageResource);
             picture.compress(Bitmap.CompressFormat.PNG, 0, stream);
@@ -71,16 +73,19 @@ public class WritePictures extends Activity {
     public int getPhotoRow(Uri rawContactUri) {
 
         final ContentResolver resolver = context.getContentResolver();
+        final Uri contentUri = ContactsContract.Data.CONTENT_URI;
+        final String selection;
         int photoRow = -1;
-        final String SELECTION;
-        final Uri PROJECTION = ContactsContract.Data.CONTENT_URI;
+
+
         if (allContacts) {
-            SELECTION = ContactsContract.Data.RAW_CONTACT_ID + " == " +
+            //TODO Fix this query to use ?
+            selection = ContactsContract.Data.RAW_CONTACT_ID + " == " +
                     ContentUris.parseId(rawContactUri) + " AND " +
                     Data.MIMETYPE + "=='" +
                     ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'";
         } else {
-            SELECTION = ContactsContract.Data.RAW_CONTACT_ID + " == " +
+            selection = ContactsContract.Data.RAW_CONTACT_ID + " == " +
                     ContentUris.parseId(rawContactUri) + " AND " +
                     Data.MIMETYPE + "=='" +
                     ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + " AND " +
@@ -89,20 +94,30 @@ public class WritePictures extends Activity {
         }
 
         Cursor cursor = resolver.query(
-                PROJECTION,
+                contentUri,
                 null,
-                SELECTION,
+                selection,
                 null,
                 null);
 
-        int columnIndex = cursor.getColumnIndex(ContactsContract.Data._ID);
-        if (columnIndex == -1) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex(ContactsContract.Data._ID);
+
+            if (columnIndex == -1) {
+                throw new IndexOutOfBoundsException();
+            }
+
+            if (columnIndex <= 0) {
+                return 0;
+            }
+
             photoRow = cursor.getInt(columnIndex);
+            cursor.close();
         }
-        cursor.close();
+
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
 
         return photoRow;
 
@@ -121,26 +136,44 @@ public class WritePictures extends Activity {
     }
 
     public ArrayList<String> readPhoneContacts() {
+        final String TAG = "readPhoneContacts";
         final ContentResolver resolver = context.getContentResolver();
-        final String TAG = "WritePictures.readPhoneContacts";
+
         ArrayList<String> contactUris = new ArrayList<>();
+
+        Uri contentUri = Data.CONTENT_URI;
+        String[] projection = new String[] {Data.CONTACT_ID};
+        String selection = null;
+
+        if (!allContacts) {
+            selection = Data.PHOTO_ID + " IS NULL OR " + Data.PHOTO_ID + " = ''";
+        }
+
         try (Cursor contactIdCursor =
                      resolver.query(
-                             ContactsContract.RawContacts.CONTENT_URI,
-                             null,
-                             null,
+                             contentUri,
+                             projection,
+                             selection,
                              null,
                              null)) {
-            if (contactIdCursor.getCount() > 0) {
-                int contactIdColumn = contactIdCursor.getColumnIndex(ContactsContract.RawContacts._ID);
+            if (contactIdCursor != null && contactIdCursor.getCount() > 0) {
+                int contactIdColumn = contactIdCursor.getColumnIndex(projection[0]);
                 while (contactIdCursor.moveToNext()) {
                     long contactId = contactIdCursor.getLong(contactIdColumn);
-                    Uri contactUri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI, contactId);
+                    Uri contactUri = ContentUris.withAppendedId(Data.CONTENT_URI, contactId);
                     contactUris.add(contactUri.toString());
                 }
+                contactIdCursor.close();
             }
+
+            if (contactIdCursor != null && !contactIdCursor.isClosed()) {
+                contactIdCursor.close();
+            }
+
         } catch (Exception e) {
             Log.e(TAG, "Threw error: " + e.getMessage());
+            Log.e(TAG, "Threw error: " + e.fillInStackTrace());
+            Log.e(TAG, "Threw error: " + e.getCause());
         }
         return contactUris;
     }
@@ -153,26 +186,26 @@ public class WritePictures extends Activity {
 
             try {
                 final ContentResolver resolver = context.getContentResolver();
-                Log.e("stuff", "THERE ARE THINGS HERE LOOK AT ME");
                 for (String rawContactUris : contactList) {
                     Uri rawContactUri = Uri.parse(rawContactUris);
-                    Log.e(TAG, "contactList uri ======= " + rawContactUris);
                     int photoRow = getPhotoRow(rawContactUri);
                     ContentValues contactContentValues = buildContactContentValues(rawContactUri);
-                    if (photoRow >= 0) {
+                    if (photoRow > 0) {
                         resolver.update(
                                 ContactsContract.Data.CONTENT_URI,
                                 contactContentValues,
                                 ContactsContract.Data._ID + " = " + photoRow, null);
-                    } else {
+                    } else if (photoRow < 0) {
                         resolver.insert(
                                 ContactsContract.Data.CONTENT_URI,
                                 contactContentValues);
                     }
                 }
+
             } catch (Exception e) {
                 Log.e(TAG, "Threw error: " + e.getMessage());
             }
+
             return true;
         }
 
@@ -182,9 +215,9 @@ public class WritePictures extends Activity {
             intent.setAction(Intent.ACTION_VIEW);
             intent.setClass(WritePictures.this, LoadingScreen.class);
             intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
-            WritePictures.this.startActivity(intent);
             intent.putExtra("allContacts", false);
             intent.putExtra("selecting", false);
+            WritePictures.this.startActivity(intent);
         }
     }
 }
