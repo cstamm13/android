@@ -169,11 +169,12 @@ public class ListViewLoader extends Activity {
             } else {
                 ListViewAdapter adapter = new ListViewAdapter(ListViewLoader.this, contactPair.toArray(new ContactPair[contactPair.size()]), contactPair, false);
                 ListView listView = (ListView) findViewById(R.id.contact_list);
+                View buttonLayout = findViewById(R.id.button_layout);
+                buttonLayout.setVisibility(View.GONE);
                 listView.setAdapter(adapter);
                 PublisherAdView mPublisherAdView = (PublisherAdView) findViewById(R.id.publisherAdView);
                 PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
                 mPublisherAdView.loadAd(adRequest);
-                cancelButtonAction();
 
             }
         }
