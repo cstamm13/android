@@ -75,29 +75,26 @@ public class WritePictures extends Activity {
         final ContentResolver resolver = context.getContentResolver();
         final Uri contentUri = ContactsContract.Data.CONTENT_URI;
         final String selection;
+        String contentUriId = String.valueOf(ContentUris.parseId(rawContactUri));
+        String[] selectionArgs = new String[] {contentUriId, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE};
+
         int photoRow = -1;
 
-
         if (allContacts) {
-            //TODO Fix this query to use ?
-            selection = ContactsContract.Data.RAW_CONTACT_ID + " == " +
-                    ContentUris.parseId(rawContactUri) + " AND " +
-                    Data.MIMETYPE + "=='" +
-                    ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'";
+            selection = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " +
+                    Data.MIMETYPE + " = ? ";
         } else {
-            selection = ContactsContract.Data.RAW_CONTACT_ID + " == " +
-                    ContentUris.parseId(rawContactUri) + " AND " +
-                    Data.MIMETYPE + "=='" +
-                    ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + " AND " +
+            selection = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " +
+                    Data.MIMETYPE + " = ? AND " +
                     ContactsContract.CommonDataKinds.Photo.PHOTO + " IS NULL OR " +
-                    ContactsContract.CommonDataKinds.Photo.PHOTO + " = ?'";
+                    ContactsContract.CommonDataKinds.Photo.PHOTO + " = ''";
         }
 
         Cursor cursor = resolver.query(
                 contentUri,
                 null,
                 selection,
-                null,
+                selectionArgs,
                 null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -164,9 +161,15 @@ public class WritePictures extends Activity {
                     contactUris.add(contactUri.toString());
                 }
                 contactIdCursor.close();
+            } else {
+                    Intent intent = new Intent(context, AlertUser.class);
+                    intent.putExtra("message","It would seem that I can't find any contacts :/");
+                    intent.putExtra("class", "stammgoodapps.cats.MainActivity");
+                    context.startActivity(intent);
+                    return null;
             }
 
-            if (contactIdCursor != null && !contactIdCursor.isClosed()) {
+            if (!contactIdCursor.isClosed()) {
                 contactIdCursor.close();
             }
 
