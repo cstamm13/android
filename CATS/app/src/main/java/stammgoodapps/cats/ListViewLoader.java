@@ -77,6 +77,14 @@ public class ListViewLoader extends Activity {
                     }
                 }
 
+                if (selectedContacts.isEmpty()) {
+                    Intent intent = new Intent(ListViewLoader.this, AlertUser.class);
+                    intent.putExtra("message", "You did not select any contacts to change!");
+                    intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
+                    ListViewLoader.this.startActivity(intent);
+                    return;
+                }
+
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 intent.setClass(ListViewLoader.this, LoadingScreen.class);
@@ -126,7 +134,7 @@ public class ListViewLoader extends Activity {
                                  SELECTION,
                                  null,
                                  SORT_ORDER)) {
-                if (contactIdCursor.getCount() > 0) {
+                if (contactIdCursor != null && contactIdCursor.getCount() > 0) {
                     while (contactIdCursor.moveToNext()) {
                         long contactId = contactIdCursor.getLong(
                                 contactIdCursor.getColumnIndex(
