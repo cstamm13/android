@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="vertical"
+    android:paddingBottom="8dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="10dp"
+    android:theme="@android:style/Theme.Material"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="8dp"
+        android:layout_weight="2"
+        android:ellipsize="marquee"
+        android:includeFontPadding="true"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:singleLine="false"
+        android:id="@+id/text"
+        android:text="@string/about_text"
+        android:textIsSelectable="true"
+        android:textSize="18sp"
+        android:textAppearance="@android:style/TextAppearance.Material.Body1"
+        android:textStyle="normal" />
 
 </LinearLayout>

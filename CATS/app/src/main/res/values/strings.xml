@@ -26,4 +26,10 @@
 
     <!-- Loading Text-->
     <string name="loading">Purring and kneading. Give me a second&#8230;</string>
+
+    <!-- About Text-->
+    <string name="about_text">\t\t This app may be a little silly, as was intended, but it was written to bring to light our love of cats. My wife and I have four cats (and a dog), and love them very much. I hope this app brings a smile to your face, and encourages you to adopt a cat of your own or donate to a local animal shelter or those foster adoptable animals.\n\n
+        \tThank you,\n\n
+        \tCasey
+    </string>
 </resources>
