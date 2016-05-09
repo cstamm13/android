@@ -65,7 +65,7 @@ public class CatOfTheDayLoader extends Activity {
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                    intent.setData(Uri.parse(cats.getUrl()));//catOfDay.get(position).getUrl()));
+                    intent.setData(Uri.parse(cats.getUrl()));
                     CatOfTheDayLoader.this.startActivity(intent);
                 }
             }
@@ -81,9 +81,10 @@ public class CatOfTheDayLoader extends Activity {
         Bitmap bitmap;
 
         protected List<CatOfDay> doInBackground(String... urls) {
-//            String urldisplay = "https://s3.amazonaws.com/stamm-cat-of-the-day/" + getDate() + ".jpeg";
+//            String pictureUrl = "https://s3.amazonaws.com/stamm-cat-of-the-day/" + getDate() + ".jpeg";
             String pictureUrl = "https://s3.amazonaws.com/stamm-cat-of-the-day/04212016.jpeg";
             String jsonUrl = "https://s3.amazonaws.com/stamm-cat-of-the-day/04212016.json";
+//            String jsonUrl = "https://s3.amazonaws.com/stamm-cat-of-the-day/" + getDate() + ".json";
             JsonObject jsonObject;
             try {
                 InputStream bitmapIn = new java.net.URL(pictureUrl).openStream();
@@ -105,10 +106,20 @@ public class CatOfTheDayLoader extends Activity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
             return list;
         }
 
         protected void onPostExecute(List<CatOfDay> catOfDay) {
+
+            if (catOfDay.isEmpty()) {
+                Intent intent = new Intent(CatOfTheDayLoader.this.getApplicationContext(), AlertUser.class);
+                intent.putExtra("message","There was an issue getting the Cat Of The Day :(");
+                intent.putExtra("class", "stammgoodapps.cats.MainActivity");
+                CatOfTheDayLoader.this.startActivity(intent);
+                return;
+            }
+
             CatOfTheDayAdapter adapter = new CatOfTheDayAdapter(CatOfTheDayLoader.this, catOfDay);
             ListView listView = (ListView) findViewById(R.id.cat_of_the_day_list_view);
             listView.setAdapter(adapter);
