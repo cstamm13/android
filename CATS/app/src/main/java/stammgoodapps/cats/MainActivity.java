@@ -93,16 +93,17 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
-        intent.setClass(MainActivity.this, LoadingScreen.class);
 
         switch (item.getItemId()) {
             case R.id.action_settings:
                 return true;
             case R.id.cat_of_the_day:
-                intent.putExtra("class", "stammgoodapps.cats.CatOfTheDayLoader");
+                intent.setClass(MainActivity.this, CatOfTheDayLoader.class);
                 MainActivity.this.startActivity(intent);
                 return true;
             case R.id.about:
+                intent.setClass(MainActivity.this, AboutLoader.class);
+                MainActivity.this.startActivity(intent);
                 return true;
         }
 
