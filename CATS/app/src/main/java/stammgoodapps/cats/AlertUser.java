@@ -16,6 +16,7 @@ public class AlertUser extends Activity {
         final Bundle extras = getIntent().getExtras();
         final String classname = extras.getString("class");
         final String message = extras.getString("message");
+        final boolean selecting = extras.getBoolean("selecting");
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setTitle("Oh no!");
@@ -24,6 +25,7 @@ public class AlertUser extends Activity {
             public void onClick(DialogInterface dialog, int which) {
                 try {
                     Intent intent = new Intent(AlertUser.this.getApplicationContext(), Class.forName(classname));
+                    intent.putExtra("selecting", selecting);
                     AlertUser.this.startActivity(intent);
                 } catch (ClassNotFoundException e) {
                     Log.e(TAG, e.getMessage());
