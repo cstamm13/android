@@ -81,6 +81,7 @@ public class ListViewLoader extends Activity {
                     Intent intent = new Intent(ListViewLoader.this, AlertUser.class);
                     intent.putExtra("message", "You did not select any contacts to change!");
                     intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
+                    intent.putExtra("selecting", selecting);
                     ListViewLoader.this.startActivity(intent);
                     return;
                 }
@@ -164,6 +165,12 @@ public class ListViewLoader extends Activity {
         }
 
         @Override
+        protected void onPreExecute() {
+            setContentView(R.layout.progress_bar);
+            findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected void onPostExecute(List<ContactPair> contactPair) {
             if (selecting) {
                 ListViewAdapter adapter = new ListViewAdapter(ListViewLoader.this, contactPair.toArray(new ContactPair[contactPair.size()]), contactPair, true);
@@ -183,8 +190,10 @@ public class ListViewLoader extends Activity {
                 PublisherAdView mPublisherAdView = (PublisherAdView) findViewById(R.id.publisherAdView);
                 PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
                 mPublisherAdView.loadAd(adRequest);
-
             }
+
+            findViewById(R.id.progressBar).setVisibility(View.INVISIBLE);
+
         }
     }
 }

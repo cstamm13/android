@@ -12,14 +12,11 @@ public class LoadingScreen extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.progress_bar);
-        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
         final Bundle extras = getIntent().getExtras();
         final String classname = extras.getString("class");
         final String TAG = "loadIntent";
-        final int WAIT_TIME = 2500;
 
-        new Handler().postDelayed(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -33,6 +30,6 @@ public class LoadingScreen extends Activity {
                     Log.e(TAG, e.getMessage());
                 }
             }
-        }, WAIT_TIME);
+        });
     }
 }

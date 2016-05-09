@@ -16,17 +16,17 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.util.Log;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.io.ByteArrayOutputStream;
-import java.util.concurrent.ExecutionException;
 
 public class WritePictures extends Activity {
 
     private Context context = WritePictures.this;
     public Boolean allContacts;
     public Boolean selecting;
-    private ArrayList<String> contactList;
+    private ArrayList<String> contactList = new ArrayList<>();
 
     public void setContactList(ArrayList<String> contactList) {
         this.contactList = contactList;
@@ -46,10 +46,17 @@ public class WritePictures extends Activity {
                 setContactList(extras.getStringArrayList("selectedContacts"));
             }
 
-            UpdatePictures updatePictures = new UpdatePictures();
-            updatePictures.execute().get();
+            if (contactList.isEmpty()) {
+                Intent intent = new Intent(context, AlertUser.class);
+                intent.putExtra("message","It would seem that I can't find any contacts :/");
+                intent.putExtra("class", "stammgoodapps.cats.MainActivity");
+                context.startActivity(intent);
+            } else {
+                new UpdatePictures().execute();
+            }
 
-        } catch (InterruptedException | ExecutionException e) {
+//        } catch (InterruptedException | ExecutionException e) {
+        } catch (Exception e) {
             Log.e(TAG, "Threw error: " + e.getMessage());
         }
     }
@@ -161,15 +168,9 @@ public class WritePictures extends Activity {
                     contactUris.add(contactUri.toString());
                 }
                 contactIdCursor.close();
-            } else {
-                    Intent intent = new Intent(context, AlertUser.class);
-                    intent.putExtra("message","It would seem that I can't find any contacts :/");
-                    intent.putExtra("class", "stammgoodapps.cats.MainActivity");
-                    context.startActivity(intent);
-                    return null;
             }
 
-            if (!contactIdCursor.isClosed()) {
+            if (contactIdCursor != null && !contactIdCursor.isClosed()) {
                 contactIdCursor.close();
             }
 
@@ -213,14 +214,20 @@ public class WritePictures extends Activity {
         }
 
         @Override
+        protected void onPreExecute() {
+            setContentView(R.layout.progress_bar);
+            findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected void onPostExecute(Boolean result) {
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_VIEW);
-            intent.setClass(WritePictures.this, LoadingScreen.class);
-            intent.putExtra("class", "stammgoodapps.cats.ListViewLoader");
+            intent.setClass(WritePictures.this, ListViewLoader.class);
             intent.putExtra("allContacts", false);
             intent.putExtra("selecting", false);
             WritePictures.this.startActivity(intent);
+            findViewById(R.id.progressBar).setVisibility(View.INVISIBLE);
         }
     }
 }
