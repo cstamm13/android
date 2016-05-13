@@ -43,7 +43,7 @@ public class ListViewLoader extends Activity {
 
         Bundle extras = getIntent().getExtras();
         this.selecting = extras.getBoolean("selecting");
-        setContentView(R.layout.contact_list);
+//        setContentView(R.layout.contact_list);
         try {
             PopulateContactList populateContactList = new PopulateContactList();
             populateContactList.execute().get();
@@ -128,6 +128,8 @@ public class ListViewLoader extends Activity {
         protected List<ContactPair> doInBackground(String... contacts) throws NullPointerException {
             final String TAG = "populateContactList";
 
+            setContentView(R.layout.contact_list);
+
             try (Cursor contactIdCursor =
                          ListViewLoader.this.getContentResolver().query(
                                  ContactsContract.Contacts.CONTENT_URI,
@@ -158,8 +160,6 @@ public class ListViewLoader extends Activity {
                 }
             } catch (NullPointerException e) {
                 Log.e(TAG, "Threw exception: " + e.getMessage());
-            } finally {
-                cancelButtonAction();
             }
             return contactPair;
         }
@@ -192,7 +192,7 @@ public class ListViewLoader extends Activity {
                 mPublisherAdView.loadAd(adRequest);
             }
 
-            findViewById(R.id.progressBar).setVisibility(View.INVISIBLE);
+//            findViewById(R.id.progressBar).setVisibility(View.INVISIBLE);
 
         }
     }
